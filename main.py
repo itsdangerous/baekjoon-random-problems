@@ -20,12 +20,12 @@ class Problem(BaseModel):
     tier: str
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/boj", response_class=HTMLResponse)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-@app.get("/problems/{tier}", response_model=List[Problem])
+@app.get("/boj/problems/{tier}", response_model=List[Problem])
 async def get_problems(tier: str):
     url = f"https://solved.ac/api/v3/search/problem?query=tier:{tier}&size=20&fields=problemId,titles,acceptedUserCount,averageTries,level&sort=random&direction=asc"
     async with httpx.AsyncClient() as client:

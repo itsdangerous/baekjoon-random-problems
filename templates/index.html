@@ -145,7 +145,7 @@
    <script>
     async function getRandomProblem(tier) {
       try {
-        const response = await fetch(`/problems/${tier}`);
+        const response = await fetch(`/boj/problems/${tier}`);
         if (!response.ok) {
           throw new Error('네트워크 응답이 정상이 아닙니다: ' + response.statusText);
         }

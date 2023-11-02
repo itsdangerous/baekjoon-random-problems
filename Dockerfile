@@ -1,6 +1,6 @@
 FROM python:3.11.6-slim
 
-WORKDIR .
+WORKDIR ./app
 
 #libgl1-mesa-glx 패키지 설치
 RUN apt-get update && apt-get -y install libgl1-mesa-glx
