@@ -12,15 +12,18 @@ app = FastAPI(title="BAEKJOON RANDOM PROBLEMS")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+
 class Problem(BaseModel):
     problemId: int
     titleKo: str
     acceptedUserCount: int
     tier: str
-        
+
+
 @app.get("/", response_class=HTMLResponse)
 async def read_item(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
 
 @app.get("/problems/{tier}", response_model=List[Problem])
 async def get_problems(tier: str):
@@ -29,27 +32,32 @@ async def get_problems(tier: str):
         response = await client.get(url)
 
     if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail="Failed to fetch problems")
+        raise HTTPException(
+            status_code=response.status_code, detail="Failed to fetch problems"
+        )
 
-    problems_data = response.json().get('items', [])
+    problems_data = response.json().get("items", [])
     problems = []
     for problem in problems_data:
         title_ko = ""
-        for title in problem.get('titles', []):
-            if title.get('language') == 'ko':
-                title_ko = title.get('title')
+        for title in problem.get("titles", []):
+            if title.get("language") == "ko":
+                title_ko = title.get("title")
                 break
         if title_ko:  # Ensure we have a Korean title before adding the problem
-            accepted_user_count = problem.get('acceptedUserCount', 0)
-            tier = await convert_level_to_tier(problem.get('level', 0))
-            problems.append({
-                "problemId": problem.get('problemId'),
-                "titleKo": title_ko,
-                "acceptedUserCount": accepted_user_count,
-                "tier": tier
-            })
+            accepted_user_count = problem.get("acceptedUserCount", 0)
+            tier = await convert_level_to_tier(problem.get("level", 0))
+            problems.append(
+                {
+                    "problemId": problem.get("problemId"),
+                    "titleKo": title_ko,
+                    "acceptedUserCount": accepted_user_count,
+                    "tier": tier,
+                }
+            )
 
     return problems
+
 
 async def convert_level_to_tier(level):
     if level == 0:
@@ -58,6 +66,3 @@ async def convert_level_to_tier(level):
     tier_level = (level - 1) // 5
     sub_level = 5 - (level - 1) % 5
     return f"{tier[tier_level]}{sub_level}"
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
